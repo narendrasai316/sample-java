@@ -15,9 +15,16 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 14
-      - run: mvn -B package --file pom.xml
-      - run: mkdir staging && cp target/*jar-with-dependencies.jar staging
-      - uses: actions/upload-artifact@v1
-        with:
-          name: Package
-          path: staging
+      - run: |
+              app_version=$(grep -E '^appVersion:' Charts/Chart.yml | awk '{print $2}')
+              name=$(grep -E '^name:' Charts/Chart.yml | awk '{print $2}')
+              project_version=$(grep -oP '(?<=<version>)[^<]+' pom.xml | awk 'NR==1')
+              echo "Project Version: $project_version"
+              echo "App Version: $app_version"
+              echo "Name: $name"
+      # - run: mvn -B package --file pom.xml
+      # - run: mkdir staging && cp target/*jar-with-dependencies.jar staging
+      # - uses: actions/upload-artifact@v1
+      #   with:
+      #     name: Package
+      #     path: staging
