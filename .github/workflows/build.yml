@@ -45,6 +45,6 @@ jobs:
       - name: Printing Versions
         run: |
           # Use the extracted version
-          echo "project_version ${{ needs.build_and_test.extract_version.outputs.project_version }}"
-          echo "app_version ${{ needs.build_and_test.extract_version.outputs.app_version }}"
-          echo "app_name ${{ needs.build_and_test.extract_version.outputs.app_name }}"
+          echo "project_version ${{ needs.build_and_test.step.extract_version.outputs.project_version }}"
+          echo "app_version ${{ needs.build_and_test.step.extract_version.outputs.app_version }}"
+          echo "app_name ${{ needs.build_and_test.step.extract_version.outputs.app_name }}"
