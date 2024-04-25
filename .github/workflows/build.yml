@@ -15,16 +15,35 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 14
-      - run: |
+      
+      - name: Extract Project Version
+        id: extract_version
+        run: |
               app_version=$(grep -E '^appVersion:' Charts/Chart.yml | awk '{print $2}')
-              name=$(grep -E '^name:' Charts/Chart.yml | awk '{print $2}')
+              app_name=$(grep -E '^name:' Charts/Chart.yml | awk '{print $2}')
               project_version=$(grep -oP '(?<=<version>)[^<]+' pom.xml | awk 'NR==1')
               echo "Project Version: $project_version"
               echo "App Version: $app_version"
-              echo "Name: $name"
-      # - run: mvn -B package --file pom.xml
-      # - run: mkdir staging && cp target/*jar-with-dependencies.jar staging
-      # - uses: actions/upload-artifact@v1
-      #   with:
-      #     name: Package
-      #     path: staging
+              echo "Name: $app_name"
+              echo "::set-output name=project_version::$project_version"
+              echo "::set-output name=app_version::$app_version"
+              echo "::set-output name=app_name::$app_name"
+      - run: mvn -B package --file pom.xml
+      - run: mkdir staging && cp target/*jar-with-dependencies.jar staging
+      - uses: actions/upload-artifact@v1
+        with:
+          name: Package
+          path: staging
+
+  build:
+    needs: build_and_test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Printing Versions
+        run: |
+          # Use the extracted version
+          echo "project_version ${{ needs.build_and_test.outputs.project_version }}"
+          echo "app_version ${{ needs.build_and_test.outputs.app_version }}"
+          echo "app_name ${{ needs.build_and_test.outputs.app_name }}"
